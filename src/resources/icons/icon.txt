@@ -1,0 +1,1 @@
+remover esse arquivo ao adicionar os ícones na pasta icons
