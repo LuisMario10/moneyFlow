@@ -18,7 +18,7 @@ cd moneyFlow
 Nunca trabalhe direto na `main`.
 
 ```bash
-git checkout -b feature/nome-da-feature
+git checkout -b seu-nome
 ```
 
 Exemplos:
