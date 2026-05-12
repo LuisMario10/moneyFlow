@@ -12,9 +12,11 @@ public class UserController {
     }
 
     public void showLogin() {
-        if (signUpView != null) signUpView.dispose();
+        if (signUpView != null) {
+            signUpView.dispose();
+        }
 
-        LoginView loginView = new LoginView();
+        this.loginView = new LoginView();
 
         loginView.getBtnCriarConta().addActionListener(e -> showSignUp());
 
@@ -22,9 +24,11 @@ public class UserController {
     }
 
     public void showSignUp() {
-        if (loginView != null) loginView.dispose();
+        if (loginView != null) {
+            loginView.dispose();
+        }
 
-        SignUpView signUpView = new SignUpView();
+        this.signUpView = new SignUpView();
 
         signUpView.getBtnCriarConta().addActionListener(e -> showLogin());
 
