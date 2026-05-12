@@ -55,7 +55,6 @@ public class LoginView extends JFrame {
         card.add(labelLogo);
         card.add(Box.createVerticalStrut(10));
 
-        // Linha separadora horizontal (estilo wireframe)
         card.add(createSeparator());
         card.add(Box.createVerticalStrut(40));
 
@@ -170,7 +169,7 @@ public class LoginView extends JFrame {
         };
         btn.setFont(new Font("SansSerif", Font.BOLD, 13));
         btn.setForeground(fgColor);
-        btn.setPreferredSize(new Dimension(130, 40));
+        btn.setPreferredSize(new Dimension(150, 40));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);

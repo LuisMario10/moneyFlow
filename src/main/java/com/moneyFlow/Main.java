@@ -2,9 +2,12 @@ package com.moneyFlow;
 
 import com.moneyFlow.view.HomeView;
 import com.moneyFlow.view.LoginView;
+import com.moneyFlow.view.SignUpView;
 
 import javax.swing.SwingUtilities;
 
 public class Main {
-    public static void main(String[] args) {}
+    public static void main(String[] args) {
+
+    }
 }
