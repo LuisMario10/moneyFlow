@@ -1,4 +1,5 @@
 package com.moneyFlow.model;
 
-public class UserModel { 
+public class UserModel {
+
 }

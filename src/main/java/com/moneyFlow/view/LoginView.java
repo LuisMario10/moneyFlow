@@ -16,6 +16,11 @@ public class LoginView extends JFrame {
     private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
 
+    // Atributos da classe
+    private JButton btnLimpar;
+    private JButton btnEntrar;
+    private JButton btnCriarConta;
+
     public LoginView() {
         setTitle("moneyFlow - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -148,9 +153,13 @@ public class LoginView extends JFrame {
         panel.setOpaque(false);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        panel.add(createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY));
-        panel.add(createStyledButton("Criar Conta", ACCENT_BLUE, Color.WHITE));
-        panel.add(createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY));
+        btnLimpar = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
+        btnCriarConta = createStyledButton("Criar Conta", ACCENT_BLUE, Color.WHITE);
+        btnEntrar = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
+
+        panel.add(btnLimpar);
+        panel.add(btnCriarConta);
+        panel.add(btnEntrar);
 
         return panel;
     }
@@ -183,5 +192,19 @@ public class LoginView extends JFrame {
         label.setForeground(TEXT_SECONDARY);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         return label;
+    }
+
+    // ==================== GETTERS ====================
+
+    public JButton getBtnLimpar() {
+        return btnLimpar;
+    }
+
+    public JButton getBtnCriarConta() {
+        return btnCriarConta;
+    }
+
+    public JButton getBtnEntrar() {
+        return btnEntrar;
     }
 }
