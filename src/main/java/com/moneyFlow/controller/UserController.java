@@ -18,7 +18,7 @@ public class UserController {
 
         this.loginView = new LoginView();
 
-        loginView.getBtnCriarConta().addActionListener(e -> showSignUp());
+        loginView.getSignUpBtn().addActionListener(e -> showSignUp());
 
         loginView.setVisible(true);
     }
@@ -30,7 +30,7 @@ public class UserController {
 
         this.signUpView = new SignUpView();
 
-        signUpView.getBtnCriarConta().addActionListener(e -> showLogin());
+        signUpView.getGoToLoginBtn().addActionListener(e -> showLogin());
 
         signUpView.setVisible(true);
     }

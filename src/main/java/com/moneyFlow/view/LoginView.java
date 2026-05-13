@@ -17,9 +17,12 @@ public class LoginView extends JFrame {
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
 
     // Atributos da classe
-    private JButton btnLimpar;
-    private JButton btnEntrar;
-    private JButton btnCriarConta;
+    private JLabel username;
+    private JLabel password;
+
+    private JButton clearBtn;
+    private JButton loginBtn;
+    private JButton signUpBtn;
 
     public LoginView() {
         setTitle("moneyFlow - Login");
@@ -64,20 +67,20 @@ public class LoginView extends JFrame {
         card.add(Box.createVerticalStrut(40));
 
         // Campo Usuário/Email com Placeholder
-        card.add(createFieldLabel("E-MAIL"));
+        username = createFieldLabel("USUÁRIO");
         JTextField emailField = createCustomTextField("Nome do Usuário");
-        card.add(emailField);
 
+        card.add(username);
+        card.add(emailField);
         card.add(Box.createVerticalStrut(25));
 
         // Campo Senha com Placeholder
-        card.add(createFieldLabel("SENHA"));
+        password = createFieldLabel("SENHA");
         JPasswordField passField = createCustomPasswordField("Senha");
+
+        card.add(password);
         card.add(passField);
-
         card.add(Box.createVerticalStrut(40));
-
-        // Painel de Botões Lado a Lado
         card.add(createButtonPanel());
 
         return card;
@@ -153,13 +156,13 @@ public class LoginView extends JFrame {
         panel.setOpaque(false);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        btnLimpar = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
-        btnCriarConta = createStyledButton("Criar Conta", ACCENT_BLUE, Color.WHITE);
-        btnEntrar = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
+        clearBtn = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
+        signUpBtn = createStyledButton("Criar Conta", ACCENT_BLUE, Color.WHITE);
+        loginBtn = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
 
-        panel.add(btnLimpar);
-        panel.add(btnCriarConta);
-        panel.add(btnEntrar);
+        panel.add(clearBtn);
+        panel.add(signUpBtn);
+        panel.add(loginBtn);
 
         return panel;
     }
@@ -196,15 +199,15 @@ public class LoginView extends JFrame {
 
     // ==================== GETTERS ====================
 
-    public JButton getBtnLimpar() {
-        return btnLimpar;
+    public JButton getClearBtn() {
+        return clearBtn;
     }
 
-    public JButton getBtnCriarConta() {
-        return btnCriarConta;
+    public JButton getSignUpBtn() {
+        return signUpBtn;
     }
 
-    public JButton getBtnEntrar() {
-        return btnEntrar;
+    public JButton getLoginBtn() {
+        return loginBtn;
     }
 }

@@ -17,9 +17,13 @@ public class SignUpView extends JFrame {
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
 
     //Atributos da classe
-    private JButton btnLimpar;
-    private JButton btnCriarConta;
-    private JButton btnEntrar;
+    private JLabel username;
+    private JLabel password;
+    private JLabel confirmPassword;
+
+    private JButton clearBtn;
+    private JButton goToLoginBtn;
+    private JButton loginBtn;
 
     public SignUpView() {
         setTitle("moneyFlow - Cadastro");
@@ -64,22 +68,28 @@ public class SignUpView extends JFrame {
         card.add(Box.createVerticalStrut(30));
 
         // Campo Usuário/Email
-        card.add(createFieldLabel("E-MAIL"));
+        username = createFieldLabel("USUÁRIO");
         JTextField emailField = createCustomTextField("Nome do Usuário");
+
+        card.add(username);
         card.add(emailField);
 
         card.add(Box.createVerticalStrut(20));
 
         // Campo Senha
-        card.add(createFieldLabel("SENHA"));
+        password = createFieldLabel("SENHA");
         JPasswordField passField = createCustomPasswordField("Senha");
+
+        card.add(password);
         card.add(passField);
 
         card.add(Box.createVerticalStrut(20));
 
         // Campo Confirmar Senha
-        card.add(createFieldLabel("CONFIRMAR SENHA"));
+        confirmPassword = createFieldLabel("CONFIRMAR SENHA");
         JPasswordField confirmPassField = createCustomPasswordField("Confirmar Senha");
+
+        card.add(confirmPassword);
         card.add(confirmPassField);
 
         card.add(Box.createVerticalStrut(40));
@@ -160,13 +170,13 @@ public class SignUpView extends JFrame {
         panel.setOpaque(false);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        btnLimpar = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
-        btnCriarConta = createStyledButton("Já Tenho Conta", ACCENT_BLUE, Color.WHITE);
-        btnEntrar = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
+        clearBtn = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
+        goToLoginBtn = createStyledButton("Já Tenho Conta", ACCENT_BLUE, Color.WHITE);
+        loginBtn = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
 
-        panel.add(btnLimpar);
-        panel.add(btnCriarConta);
-        panel.add(btnEntrar);
+        panel.add(clearBtn);
+        panel.add(goToLoginBtn);
+        panel.add(loginBtn);
 
         return panel;
     }
@@ -203,15 +213,15 @@ public class SignUpView extends JFrame {
 
     // ==================== GETTERS ====================
 
-    public JButton getBtnCriarConta() {
-        return btnCriarConta;
+    public JButton getGoToLoginBtn() {
+        return goToLoginBtn;
     }
 
-    public JButton getBtnLimpar() {
-        return btnLimpar;
+    public JButton getClearBtn() {
+        return clearBtn;
     }
 
-    public JButton getBtnEntrar() {
-        return btnEntrar;
+    public JButton getLoginBtn() {
+        return loginBtn;
     }
 }
