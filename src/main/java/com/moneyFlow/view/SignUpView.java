@@ -17,13 +17,17 @@ public class SignUpView extends JFrame {
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
 
     //Atributos da classe
-    private JLabel username;
-    private JLabel password;
-    private JLabel confirmPassword;
+    private JLabel usernameLabel;
+    private JLabel passwordLabel;
+    private JLabel confirmPasswordLabel;
+
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JPasswordField confirmPasswordField;
 
     private JButton clearBtn;
     private JButton goToLoginBtn;
-    private JButton loginBtn;
+    private JButton signUpBtn;
 
     public SignUpView() {
         setTitle("moneyFlow - Cadastro");
@@ -68,29 +72,29 @@ public class SignUpView extends JFrame {
         card.add(Box.createVerticalStrut(30));
 
         // Campo Usuário/Email
-        username = createFieldLabel("USUÁRIO");
-        JTextField emailField = createCustomTextField("Nome do Usuário");
+        usernameLabel = createFieldLabel("USUÁRIO");
+        usernameField = createCustomTextField("Nome do Usuário");
 
-        card.add(username);
-        card.add(emailField);
+        card.add(usernameLabel);
+        card.add(usernameField);
 
         card.add(Box.createVerticalStrut(20));
 
         // Campo Senha
-        password = createFieldLabel("SENHA");
-        JPasswordField passField = createCustomPasswordField("Senha");
+        passwordLabel = createFieldLabel("SENHA");
+        passwordField = createCustomPasswordField("Senha");
 
-        card.add(password);
-        card.add(passField);
+        card.add(passwordLabel);
+        card.add(passwordField);
 
         card.add(Box.createVerticalStrut(20));
 
         // Campo Confirmar Senha
-        confirmPassword = createFieldLabel("CONFIRMAR SENHA");
-        JPasswordField confirmPassField = createCustomPasswordField("Confirmar Senha");
+        confirmPasswordLabel = createFieldLabel("CONFIRMAR SENHA");
+        confirmPasswordField = createCustomPasswordField("Confirmar Senha");
 
-        card.add(confirmPassword);
-        card.add(confirmPassField);
+        card.add(confirmPasswordLabel);
+        card.add(confirmPasswordField);
 
         card.add(Box.createVerticalStrut(40));
 
@@ -172,11 +176,11 @@ public class SignUpView extends JFrame {
 
         clearBtn = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
         goToLoginBtn = createStyledButton("Já Tenho Conta", ACCENT_BLUE, Color.WHITE);
-        loginBtn = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
+        signUpBtn = createStyledButton("Registrar", BORDER_COLOR, TEXT_SECONDARY);
 
         panel.add(clearBtn);
         panel.add(goToLoginBtn);
-        panel.add(loginBtn);
+        panel.add(signUpBtn);
 
         return panel;
     }
@@ -213,6 +217,18 @@ public class SignUpView extends JFrame {
 
     // ==================== GETTERS ====================
 
+    public JTextField getUsernameField() {
+        return usernameField;
+    }
+
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
+
+    public JPasswordField getConfirmPasswordField() {
+        return confirmPasswordField;
+    }
+
     public JButton getGoToLoginBtn() {
         return goToLoginBtn;
     }
@@ -221,7 +237,21 @@ public class SignUpView extends JFrame {
         return clearBtn;
     }
 
-    public JButton getLoginBtn() {
-        return loginBtn;
+    public JButton getSignUpBtn() {
+        return signUpBtn;
+    }
+
+    // ==================== SETTERS ====================
+
+    public void setUsernameField(JTextField usernameField) {
+        this.usernameField = usernameField;
+    }
+
+    public void setPasswordField(JPasswordField passwordField) {
+        this.passwordField = passwordField;
+    }
+
+    public void setConfirmPasswordField(JPasswordField confirmPasswordField) {
+        this.confirmPasswordField = confirmPasswordField;
     }
 }

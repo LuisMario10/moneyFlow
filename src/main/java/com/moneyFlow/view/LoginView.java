@@ -17,8 +17,11 @@ public class LoginView extends JFrame {
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
 
     // Atributos da classe
-    private JLabel username;
-    private JLabel password;
+    private JLabel usernameLabel;
+    private JLabel passwordLabel;
+
+    private JTextField usernameField;
+    private JPasswordField passwordField;
 
     private JButton clearBtn;
     private JButton loginBtn;
@@ -67,22 +70,21 @@ public class LoginView extends JFrame {
         card.add(Box.createVerticalStrut(40));
 
         // Campo Usuário/Email com Placeholder
-        username = createFieldLabel("USUÁRIO");
-        JTextField emailField = createCustomTextField("Nome do Usuário");
+        usernameLabel = createFieldLabel("USUÁRIO");
+        usernameField = createCustomTextField("Nome do Usuário");
 
-        card.add(username);
-        card.add(emailField);
+        card.add(usernameLabel);
+        card.add(usernameField);
         card.add(Box.createVerticalStrut(25));
 
         // Campo Senha com Placeholder
-        password = createFieldLabel("SENHA");
-        JPasswordField passField = createCustomPasswordField("Senha");
+        passwordLabel = createFieldLabel("SENHA");
+        passwordField = createCustomPasswordField("Senha");
 
-        card.add(password);
-        card.add(passField);
+        card.add(passwordLabel);
+        card.add(passwordField);
         card.add(Box.createVerticalStrut(40));
         card.add(createButtonPanel());
-
         return card;
     }
 
@@ -199,6 +201,14 @@ public class LoginView extends JFrame {
 
     // ==================== GETTERS ====================
 
+    public JTextField getUsernameField() {
+        return usernameField;
+    }
+
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
+
     public JButton getClearBtn() {
         return clearBtn;
     }
@@ -209,5 +219,15 @@ public class LoginView extends JFrame {
 
     public JButton getLoginBtn() {
         return loginBtn;
+    }
+
+    // ==================== SETTERS ====================
+
+    public void setUsernameField(JTextField usernameField) {
+        this.usernameField = usernameField;
+    }
+
+    public void setPasswordField(JPasswordField passwordField) {
+        this.passwordField = passwordField;
     }
 }
