@@ -71,7 +71,7 @@ public class UserController {
             showLogin();
         }
         else {
-            showError("Este nome de usuário já está em uso ou ocorreu um erro no servidor.");
+            showError("Este nome de usuário já está em uso.");
         }
     }
 
