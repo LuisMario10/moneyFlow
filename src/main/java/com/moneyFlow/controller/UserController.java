@@ -1,5 +1,6 @@
 package com.moneyFlow.controller;
 
+import com.moneyFlow.DAO.UserDAO;
 import com.moneyFlow.service.AuthService;
 import com.moneyFlow.view.LoginView;
 import com.moneyFlow.view.SignUpView;
@@ -78,23 +79,12 @@ public class UserController {
         String user = loginView.getUsernameField().getText();
         String pass = new String(loginView.getPasswordField().getPassword());
 
-        if (user == null) {
-            showError("Usuário não encontrado.");
-            return;
-        }
-
-        if (pass == null) {
-            showError("Senha incorreta.");
-            return;
-        }
-
-        // Precisa de uma verificação!
-        if (AuthService.validateLogin(user, pass)) {
+        if (AuthService.login(user, pass)) {
             JOptionPane.showMessageDialog(loginView, "Logado com sucesso!", "Sucesso",  JOptionPane.INFORMATION_MESSAGE);
             showHome();
         }
         else {
-            showError("Erro ao tentar logar");
+            showError("Verifique se o email e a senha estão corretos!");
         }
     }
 
