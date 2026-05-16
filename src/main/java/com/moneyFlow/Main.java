@@ -1,7 +1,10 @@
 package com.moneyFlow;
 
+import com.moneyFlow.view.HomeView;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Rodando projeto moneyFlow...");
+        HomeView homeView = new HomeView();
+        homeView.setVisible(true);
     }
 }

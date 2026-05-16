@@ -9,6 +9,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import com.moneyFlow.util.CurrencyUtils;
+import com.moneyFlow.view.dialogs.NewTransactionDialog;
 
 public class HomeView extends JFrame {
 
@@ -173,8 +174,13 @@ public class HomeView extends JFrame {
         // Centro: Botões de ação
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         centerPanel.setOpaque(false);
-        centerPanel.add(this.createCustomButton("+ Nova Receita", new Color(40, 80, 60), ACCENT_GREEN));
-        centerPanel.add(this.createCustomButton("- Nova Despesa", new Color(80, 35, 35), ACCENT_RED));
+        JButton btnReceita = this.createCustomButton("+ Nova Receita", new Color(40, 80, 60), ACCENT_GREEN);
+        btnReceita.addActionListener(e -> openNewTransactionDialog(true));
+        centerPanel.add(btnReceita);
+
+        JButton btnDespesa = this.createCustomButton("- Nova Despesa", new Color(80, 35, 35), ACCENT_RED);
+        btnDespesa.addActionListener(e -> openNewTransactionDialog(false));
+        centerPanel.add(btnDespesa);
 
         barPanel.add(centerPanel, BorderLayout.CENTER);
 
@@ -324,6 +330,44 @@ public class HomeView extends JFrame {
         card.add(lastOperationDateLabel);
 
         return card;
+    }
+
+    // ==================== DIALOGS ====================
+
+    private void openNewTransactionDialog(boolean isIncome) {
+        NewTransactionDialog dialog = new NewTransactionDialog(this, isIncome);
+        dialog.setVisible(true);
+
+        if (dialog.isConfirmed()) {
+            String title = dialog.getTitulo();
+            String value = dialog.getValor();
+            String date = dialog.getData();
+            String category = dialog.getCategoria();
+            String description = dialog.getDescricao();
+
+            int amountInCents = parseValueToCents(value);
+            if (!isIncome) {
+                amountInCents = -Math.abs(amountInCents);
+            }
+
+            // this.controller.post(title, EFinancialType.VARIABLE, amountInCents, date, category, description);
+
+            // loadDataFromDatabase();
+            // updateBalance(this.currentBalanceInCents);
+            // updateLastOperation(this.titleLastOperation, this.categoryLastOperation, this.valueLastOperationInCents, this.dateLastOperation);
+        }
+    }
+
+    private int parseValueToCents(String value) {
+        try {
+            value = value.replaceAll("[R$\\s]", "");
+            value = value.replace(".", "");
+            value = value.replace(",", ".");
+            double parsed = Double.parseDouble(value);
+            return (int) Math.round(parsed * 100);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     // ==================== UTILITÁRIOS ====================
