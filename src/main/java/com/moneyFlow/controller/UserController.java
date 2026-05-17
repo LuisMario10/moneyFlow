@@ -91,4 +91,4 @@ public class UserController {
     private void showError(String message) {
         JOptionPane.showMessageDialog(signUpView, message, "Erro de Validação", JOptionPane.ERROR_MESSAGE);
     }
-}   
+}
