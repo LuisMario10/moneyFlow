@@ -8,6 +8,10 @@ import java.awt.geom.RoundRectangle2D;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.moneyFlow.controller.FinancialSummaryController;
+import com.moneyFlow.controller.FinancialTransactionController;
+import com.moneyFlow.model.FinancialTransactionModel;
+import com.moneyFlow.model.EFinancialType;
 import com.moneyFlow.view.UserAccountManagementView;
 import com.moneyFlow.util.CurrencyUtils;
 import com.moneyFlow.view.dialogs.NewTransactionDialog;
@@ -34,7 +38,15 @@ public class HomeView extends JFrame {
     private static final Font FONT_CARD_VALUE = new Font("SansSerif", Font.BOLD, 20);
     private static final Font FONT_CARD_INFO = new Font("SansSerif", Font.PLAIN, 13);
 
-    private int currentBalanceInCents = 10000;
+    // Dados de exibição (placeholders que serão substituídos por dados reais)
+    // Temporário até o login ser implementado
+    private int userId = 1;
+
+    // Controllers
+    private FinancialTransactionController transactionController = new FinancialTransactionController();
+    private FinancialSummaryController summaryController = new FinancialSummaryController();
+
+    private int currentBalanceInCents = 0;
     private String feedbackMessage = "Você Esta Indo Bem";
     private String titleLastOperation = "Hort Fruit";
     private String categoryLastOperation = "Variável";
@@ -49,8 +61,20 @@ public class HomeView extends JFrame {
 
     public HomeView() {
         windowConfig();
+        loadDataFromDatabase();
         JPanel mainPanel = createMainPanel();
         setContentPane(mainPanel);
+    }
+
+    private void loadDataFromDatabase() {
+        this.currentBalanceInCents = summaryController.getBalance(this.userId);
+        if (this.currentBalanceInCents > 0) {
+            this.feedbackMessage = "Voce Esta Indo Bem";
+        } else if (this.currentBalanceInCents == 0) {
+            this.feedbackMessage = "Fique Atento";
+        } else {
+            this.feedbackMessage = "Cuidado Com os Gastos";
+        }
     }
 
     private void windowConfig() {
@@ -273,22 +297,23 @@ public class HomeView extends JFrame {
             String date = dialog.getData();
             String category = dialog.getCategoria();
             String description = dialog.getDescricao();
-            int amountInCents = parseValueToCents(value);
+            int amountInCents = CurrencyUtils.parseValueToCents(value);
             if (!isIncome) {
                 amountInCents = -Math.abs(amountInCents);
             }
-        }
-    }
 
-    private int parseValueToCents(String value) {
-        try {
-            value = value.replaceAll("[R$\\s]", "");
-            value = value.replace(".", "");
-            value = value.replace(",", ".");
-            double parsed = Double.parseDouble(value);
-            return (int) Math.round(parsed * 100);
-        } catch (NumberFormatException e) {
-            return 0;
+            // 1. Salva a transação no banco
+            FinancialTransactionModel transaction = new FinancialTransactionModel(
+                this.userId, title, EFinancialType.VARIABLE, amountInCents, date, category, description
+            );
+            transactionController.post(transaction);
+
+            // 2. Atualiza o financial_summary e obtém o novo saldo
+            int newBalance = summaryController.updateSummaryWithTransaction(this.userId, amountInCents, isIncome);
+
+            // 3. Atualiza a tela
+            updateBalance(newBalance);
+            updateLastOperation(title, category, amountInCents, date);
         }
     }
 
@@ -308,7 +333,7 @@ public class HomeView extends JFrame {
     }
 
     private String formatCurrency(int value) {
-        double valueInDouble = CurrencyUtils.currencyConverter(value);
+        double valueInDouble = value / 100.0;
         NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.of("pt", "BR"));
         String formatted = nf.format(Math.abs(valueInDouble));
         if (value < 0) {
