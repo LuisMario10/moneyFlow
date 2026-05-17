@@ -1,7 +1,6 @@
 package com.moneyFlow.DAO;
 
 import com.moneyFlow.config.ConnectionDataBase;
-import com.moneyFlow.model.UserModel;
 import com.moneyFlow.security.PasswordHasher;
 
 import java.sql.Connection;
@@ -9,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDAO extends GenericDAO<UserModel> {
+public class UserDAO {
 
     public static boolean isUsernameTaken(String username) {
         String sql = "SELECT count(*) FROM user WHERE access_name = ?";
