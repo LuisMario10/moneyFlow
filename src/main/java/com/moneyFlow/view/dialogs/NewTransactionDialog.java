@@ -27,12 +27,10 @@ public class NewTransactionDialog extends JDialog {
     public NewTransactionDialog(JFrame parent, boolean isReceita) {
         super(parent, isReceita ? "Nova Receita" : "Nova Despesa", true);
         this.isReceita = isReceita;
-
         setSize(400, 550);
         setLocationRelativeTo(parent);
         setResizable(false);
         getContentPane().setBackground(BG_DARK);
-
         initComponents();
     }
 
@@ -42,7 +40,6 @@ public class NewTransactionDialog extends JDialog {
         mainPanel.setBackground(BG_DARK);
         mainPanel.setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        // Título do header
         JLabel lblHeader = new JLabel(isReceita ? "Adicionar Receita" : "Adicionar Despesa");
         lblHeader.setFont(new Font("SansSerif", Font.BOLD, 22));
         lblHeader.setForeground(isReceita ? new Color(72, 199, 142) : new Color(235, 87, 87));
@@ -50,7 +47,6 @@ public class NewTransactionDialog extends JDialog {
         mainPanel.add(lblHeader);
         mainPanel.add(Box.createVerticalStrut(25));
 
-        // Campos do formulário
         txtTitle = createTextField();
         mainPanel.add(createFieldPanel("Título", txtTitle));
 
@@ -61,7 +57,7 @@ public class NewTransactionDialog extends JDialog {
         txtDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         mainPanel.add(createFieldPanel("Data (DD/MM/AAAA)", txtDate));
 
-        String[] categories = isReceita ? new String[]{"Salário", "Investimento", "Outros"} 
+        String[] categories = isReceita ? new String[]{"Salário", "Investimento", "Outros"}
                                         : new String[]{"Alimentação", "Transporte", "Moradia", "Lazer", "Outros"};
         cbCategory = new JComboBox<>(categories);
         cbCategory.setBackground(BG_INPUT);
@@ -80,7 +76,7 @@ public class NewTransactionDialog extends JDialog {
         ));
         txtDescription.setLineWrap(true);
         txtDescription.setWrapStyleWord(true);
-        
+
         JPanel descPanel = new JPanel(new BorderLayout(0, 5));
         descPanel.setBackground(BG_DARK);
         JLabel lblDesc = new JLabel("Descrição");
@@ -93,13 +89,12 @@ public class NewTransactionDialog extends JDialog {
 
         mainPanel.add(Box.createVerticalStrut(25));
 
-        // Botões de ação
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         buttonsPanel.setBackground(BG_DARK);
 
         JButton btnCancel = createButton("Cancelar", new Color(60, 60, 75), TEXT_PRIMARY);
         btnCancel.addActionListener(e -> dispose());
-        
+
         JButton btnSave = createButton("Salvar", ACCENT_COLOR, Color.WHITE);
         btnSave.addActionListener(e -> {
             confirmed = true;
@@ -129,11 +124,9 @@ public class NewTransactionDialog extends JDialog {
     private JPanel createFieldPanel(String labelText, JComponent field) {
         JPanel panel = new JPanel(new BorderLayout(0, 5));
         panel.setBackground(BG_DARK);
-        
         JLabel label = new JLabel(labelText);
         label.setForeground(TEXT_SECONDARY);
         label.setFont(new Font("SansSerif", Font.BOLD, 13));
-        
         panel.add(label, BorderLayout.NORTH);
         panel.add(field, BorderLayout.CENTER);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
@@ -166,27 +159,10 @@ public class NewTransactionDialog extends JDialog {
         return btn;
     }
 
-    public boolean isConfirmed() {
-        return confirmed;
-    }
-
-    public String getTitulo() {
-        return txtTitle.getText().trim();
-    }
-
-    public String getValor() {
-        return txtValue.getText().trim();
-    }
-
-    public String getData() {
-        return txtDate.getText().trim();
-    }
-
-    public String getCategoria() {
-        return cbCategory.getSelectedItem().toString();
-    }
-
-    public String getDescricao() {
-        return txtDescription.getText().trim();
-    }
+    public boolean isConfirmed() { return confirmed; }
+    public String getTitulo() { return txtTitle.getText().trim(); }
+    public String getValor() { return txtValue.getText().trim(); }
+    public String getData() { return txtDate.getText().trim(); }
+    public String getCategoria() { return cbCategory.getSelectedItem().toString(); }
+    public String getDescricao() { return txtDescription.getText().trim(); }
 }
