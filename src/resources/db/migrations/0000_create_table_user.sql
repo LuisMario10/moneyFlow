@@ -1,5 +1,5 @@
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    access_name TEXT NOT NULL,
+    access_name TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL
 );  

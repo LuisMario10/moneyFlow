@@ -26,7 +26,7 @@ public class FinancialSummaryController {
         int result = financialSummary.getTotalCreditInCents() - financialSummary.getTotalDebitInCents();
         financialSummary.setResultInCents(result);
 
-        int id = financialSummaryDAO.create(financialSummary);
+        financialSummaryDAO.create(financialSummary);
     }
 
     /**

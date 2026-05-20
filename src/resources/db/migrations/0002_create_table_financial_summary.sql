@@ -6,5 +6,6 @@ CREATE TABLE financial_summary (
     total_credit_in_cents INTEGER NOT NULL,
     total_debit_in_cents INTEGER NOT NULL,
     result_in_cents INTEGER NOT NULL,
+    
     FOREIGN KEY (user_id) REFERENCES user(id)
 )

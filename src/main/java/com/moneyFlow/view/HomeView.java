@@ -8,7 +8,12 @@ import java.awt.geom.RoundRectangle2D;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.moneyFlow.controller.FinancialSummaryController;
+import com.moneyFlow.controller.FinancialTransactionController;
+import com.moneyFlow.model.FinancialTransactionModel;
+import com.moneyFlow.model.EFinancialType;
 import com.moneyFlow.util.CurrencyUtils;
+import com.moneyFlow.view.dialogs.NewTransactionDialog;
 
 public class HomeView extends JFrame {
 
@@ -35,11 +40,18 @@ public class HomeView extends JFrame {
     private static final Font FONT_CARD_INFO = new Font("SansSerif", Font.PLAIN, 13);
 
     // Dados de exibição (placeholders que serão substituídos por dados reais)
-    private int currentBalanceInCents = 10000;
-    private String feedbackMessage = "Você Esta Indo Bem";
-    private String titleLastOperation = "Hort Fruit";
-    private String categoryLastOperation = "Variável";
-    private int valueLastOperationInCents = -15000;
+    // Temporário até o login ser implementado
+    private int userId = 1;
+
+    // Controllers
+    private FinancialTransactionController transactionController = new FinancialTransactionController();
+    private FinancialSummaryController summaryController = new FinancialSummaryController();
+
+    private int currentBalanceInCents = 0;
+    private String feedbackMessage = "Bem-vindo ao moneyFlow!";
+    private String titleLastOperation = "Sem lançamentos";
+    private String categoryLastOperation = "-";
+    private int valueLastOperationInCents = 0;
     private String dateLastOperation = "00/00/0000 - 00:00";
 
     private JLabel balanceLabel;
@@ -50,8 +62,20 @@ public class HomeView extends JFrame {
 
     public HomeView() {
         windowConfig();
+        loadDataFromDatabase();
         JPanel mainPanel = createMainPanel();
         setContentPane(mainPanel);
+    }
+
+    private void loadDataFromDatabase() {
+        this.currentBalanceInCents = summaryController.getBalance(this.userId);
+        if (this.currentBalanceInCents > 0) {
+            this.feedbackMessage = "Voce Esta Indo Bem";
+        } else if (this.currentBalanceInCents == 0) {
+            this.feedbackMessage = "Fique Atento";
+        } else {
+            this.feedbackMessage = "Cuidado Com os Gastos";
+        }
     }
 
     private void windowConfig() {
@@ -142,6 +166,15 @@ public class HomeView extends JFrame {
             public void mouseExited(MouseEvent e) {
                 label.setForeground(TEXT_SECONDARY);
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ("Meu Perfil".equals(texto)) {
+                    new UserAccountManagementView().setVisible(true);
+                } else if ("Configurações".equals(texto)) {
+                    new ConfigView().setVisible(true);
+                }
+            }
         });
 
         return label;
@@ -173,8 +206,15 @@ public class HomeView extends JFrame {
         // Centro: Botões de ação
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         centerPanel.setOpaque(false);
-        centerPanel.add(this.createCustomButton("+ Nova Receita", new Color(40, 80, 60), ACCENT_GREEN));
-        centerPanel.add(this.createCustomButton("- Nova Despesa", new Color(80, 35, 35), ACCENT_RED));
+        
+        JButton btnNovaReceita = this.createCustomButton("+ Nova Receita", new Color(40, 80, 60), ACCENT_GREEN);
+        btnNovaReceita.addActionListener(e -> openNewTransactionDialog(true));
+        
+        JButton btnNovaDespesa = this.createCustomButton("- Nova Despesa", new Color(80, 35, 35), ACCENT_RED);
+        btnNovaDespesa.addActionListener(e -> openNewTransactionDialog(false));
+        
+        centerPanel.add(btnNovaReceita);
+        centerPanel.add(btnNovaDespesa);
 
         barPanel.add(centerPanel, BorderLayout.CENTER);
 
@@ -326,6 +366,39 @@ public class HomeView extends JFrame {
         return card;
     }
 
+    private void openNewTransactionDialog(boolean isIncome) {
+        NewTransactionDialog dialog = new NewTransactionDialog(this, isIncome);
+        dialog.setVisible(true);
+        if (dialog.isConfirmed()) {
+            String title = dialog.getTitulo();
+            String value = dialog.getValor();
+            String date = dialog.getData();
+            String category = dialog.getCategoria();
+            String description = dialog.getDescricao();
+            int amountInCents = CurrencyUtils.parseValueToCents(value);
+            if (!isIncome) {
+                amountInCents = -Math.abs(amountInCents);
+            }
+
+            // Atualiza o saldo cumulativo
+            this.currentBalanceInCents += amountInCents;
+            int currentResult = this.currentBalanceInCents;
+
+            // 1. Salva a transação no banco com o result_in_cents
+            FinancialTransactionModel transaction = new FinancialTransactionModel(
+                this.userId, title, EFinancialType.VARIABLE, amountInCents, currentResult, date, category, description
+            );
+            transactionController.post(transaction);
+
+            // 2. Atualiza o financial_summary
+            summaryController.updateSummaryWithTransaction(this.userId, amountInCents, isIncome);
+
+            // 3. Atualiza a tela
+            updateBalance(currentResult);
+            updateLastOperation(title, category, amountInCents, date);
+        }
+    }
+
     // ==================== UTILITÁRIOS ====================
 
     private JPanel createBaseCard() {
@@ -344,8 +417,8 @@ public class HomeView extends JFrame {
     }
 
     private String formatCurrency(int value) {
-        double valueInDouble = CurrencyUtils.currencyConverter(value);
-        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        double valueInDouble = value / 100.0;
+        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.of("pt", "BR"));
         String formatted = nf.format(Math.abs(valueInDouble));
         if (value < 0) {
             return "- " + formatted;

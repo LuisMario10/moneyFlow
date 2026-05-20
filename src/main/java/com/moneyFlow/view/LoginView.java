@@ -71,7 +71,7 @@ public class LoginView extends JFrame {
 
         // Campo Usuário/Email com Placeholder
         usernameLabel = createFieldLabel("USUÁRIO");
-        usernameField = createCustomTextField("Nome do Usuário");
+        usernameField = createCustomTextField("Nome");
 
         card.add(usernameLabel);
         card.add(usernameField);

@@ -77,6 +77,12 @@ public class UserAccountManagementView extends JFrame {
         logo.setFont(FONT_LOGO);
         logo.setForeground(ACCENT_BLUE);
         logo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dispose(); // Volta para a tela principal (HomeView)
+            }
+        });
         navbar.add(logo, BorderLayout.WEST);
         JPanel menusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 0));
         menusPanel.setOpaque(false);
@@ -98,6 +104,12 @@ public class UserAccountManagementView extends JFrame {
             label.addMouseListener(new MouseAdapter() {
                 @Override public void mouseEntered(MouseEvent e) { label.setForeground(TEXT_PRIMARY); }
                 @Override public void mouseExited(MouseEvent e)  { label.setForeground(TEXT_SECONDARY); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    if ("Configurações".equals(texto)) {
+                        dispose();
+                        new ConfigView().setVisible(true);
+                    }
+                }
             });
         }
         return label;

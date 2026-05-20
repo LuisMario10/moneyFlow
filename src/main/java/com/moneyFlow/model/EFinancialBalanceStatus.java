@@ -1,4 +1,7 @@
 package com.moneyFlow.model;
 
-public enum EFinancialBalanceStatus {    
+public enum EFinancialBalanceStatus {  
+    BAD,
+    NORMAL,  
+    GOOD  
 }

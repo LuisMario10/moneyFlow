@@ -12,8 +12,8 @@ public class ConfigView extends JFrame {
     private static final Color BG_CARD = new Color(30, 30, 42);
     private static final Color BG_NAVBAR = new Color(22, 22, 32);
     private static final Color ACCENT_BLUE = new Color(80, 140, 255);
-    private static final Color ACCENT_GREEN = new Color(72, 199, 142);
-    private static final Color ACCENT_RED = new Color(235, 87, 87);
+    // private static final Color ACCENT_GREEN = new Color(72, 199, 142);
+    // private static final Color ACCENT_RED = new Color(235, 87, 87);
     private static final Color TEXT_PRIMARY = new Color(235, 235, 245);
     private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
@@ -32,7 +32,7 @@ public class ConfigView extends JFrame {
 
     private void windowConfig() {
         setTitle("moneyFlow - Configurações");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(900, 650);
         setMinimumSize(new Dimension(750, 550));
         setLocationRelativeTo(null);
@@ -76,6 +76,13 @@ public class ConfigView extends JFrame {
         JLabel logo = new JLabel("moneyFlow");
         logo.setFont(FONT_LOGO);
         logo.setForeground(ACCENT_BLUE);
+        logo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dispose(); // Volta para a tela principal (HomeView)
+            }
+        });
         navbar.add(logo, BorderLayout.WEST);
 
         JPanel menusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 0));
@@ -108,6 +115,14 @@ public class ConfigView extends JFrame {
             public void mouseExited(MouseEvent e) {
                 // Retorna perfeitamente para a cor padrão sem bugar
                 label.setForeground(defaultColor);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ("Meu Perfil".equals(texto)) {
+                    dispose();
+                    new UserAccountManagementView().setVisible(true);
+                }
             }
         });
 

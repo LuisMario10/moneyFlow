@@ -125,7 +125,7 @@ public class FinancialSummaryDAO implements IGenericDAO<FinancialSummaryModel> {
     }
 
     @Override
-    public int create(FinancialSummaryModel entity) {
+    public void create(FinancialSummaryModel entity) {
         this.sql = "INSERT INTO financial_summary (user_id, date_init, date_end, total_credit_in_cents, total_debit_in_cents, result_in_cents) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             ps = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(this.sql);
@@ -136,7 +136,7 @@ public class FinancialSummaryDAO implements IGenericDAO<FinancialSummaryModel> {
             ps.setInt(5, entity.getTotalDebitInCents());
             ps.setInt(6, entity.getResultInCents());
             
-            return ps.executeUpdate();
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -146,7 +146,6 @@ public class FinancialSummaryDAO implements IGenericDAO<FinancialSummaryModel> {
                 e.printStackTrace();
             }
         }
-        return 0;
     }
 
     public void updateCredit(int userId, int id, int totalCreditInCents) {

@@ -1,72 +1,97 @@
 package com.moneyFlow.DAO;
 
-import com.moneyFlow.config.ConnectionDataBase;
-import com.moneyFlow.security.PasswordHasher;
+import java.util.*;
 
-import java.sql.Connection;
+import com.moneyFlow.model.UserModel;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
-public class UserDAO {
+import com.moneyFlow.config.ConnectionDataBase;
 
-    public static boolean isUsernameTaken(String username) {
-        String sql = "SELECT count(*) FROM user WHERE access_name = ?";
+public class UserDAO implements IGenericDAO<UserModel> {
+    private String sql;
 
-        try (Connection conn = ConnectionDataBase.getConnectionWithDataBase();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao verificar disponibilidade de username: " + e.getMessage());
-        }
-        return false;
-    }
-
-    public static boolean saveUser(String access_name, String password) {
-        String sql = "INSERT INTO user (access_name, password) VALUES (?, ?)";
-
-        String hashedPassword = PasswordHasher.hash(password);
-
-        try (Connection conn = ConnectionDataBase.getConnectionWithDataBase();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, access_name);
-            pstmt.setString(2, hashedPassword);
-
+    public void create(UserModel user) {
+        this.sql = "INSERT INTO user (access_name, password) VALUES (?, ?)";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getPassword());
             pstmt.executeUpdate();
-            return true;
         } catch (SQLException e) {
-            System.err.println("Erro ao inserir usuário no banco: " + e.getMessage());
-            return false;
+            System.out.println(e.getMessage());
         }
     }
 
-    public static boolean validateLogin(String username, String password) {
-        String sql = "SELECT password FROM user WHERE access_name = ?";
+    public List<UserModel> findAll() {
+        this.sql = "SELECT * FROM user";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            List<UserModel> users = new ArrayList<>();
+            while (rs.next()) {
+                users.add(new UserModel(rs.getInt("id"), rs.getString("access_name"), "", rs.getString("password")));
+            }
+            return users;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
 
-        try (Connection conn = ConnectionDataBase.getConnectionWithDataBase();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    String storedHash = rs.getString("password");
-
-                    return PasswordHasher.check(password, storedHash);
-                }
+    public UserModel findByID(int id) {
+        this.sql = "SELECT * FROM user WHERE id = ?";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new UserModel(rs.getInt("id"), rs.getString("access_name"), "", rs.getString("password"));
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao validar login: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
-        return false;
+        return null;
     }
 
+    public UserModel findByAccessName(String accessName) {
+        this.sql = "SELECT * FROM user WHERE access_name = ?";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            pstmt.setString(1, accessName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new UserModel(rs.getInt("id"), rs.getString("access_name"), "", rs.getString("password"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+    
+
+    public void update(UserModel user) {
+        this.sql = "UPDATE user SET access_name = ?, password = ? WHERE id = ?";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setInt(3, user.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void delete(int id) {
+        this.sql = "DELETE FROM user WHERE id = ?";
+        try {
+            PreparedStatement pstmt = ConnectionDataBase.getConnectionWithDataBase().prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

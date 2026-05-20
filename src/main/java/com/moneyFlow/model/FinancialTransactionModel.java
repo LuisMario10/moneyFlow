@@ -6,15 +6,17 @@ public class FinancialTransactionModel {
     private String title;
     private EFinancialType type;
     private int amountInCents;
+    private int resultInCents;
     private String date;
     private String category;
     private String description;
     
-    public FinancialTransactionModel(int userId, String title, EFinancialType type, int amountInCents, String date, String category, String description) {
+    public FinancialTransactionModel(int userId, String title, EFinancialType type, int amountInCents, int resultInCents, String date, String category, String description) {
         this.setUserId(userId);
         this.setTitle(title);
         this.setType(type);
         this.setAmountInCents(amountInCents);
+        this.setResultInCents(resultInCents);
         this.setDate(date);
         this.setCategory(category);
         this.setDescription(description);
@@ -50,6 +52,14 @@ public class FinancialTransactionModel {
 
     public void setAmountInCents(int amountInCents) {
         this.amountInCents = amountInCents;
+    }
+
+    public int getResultInCents() {
+        return resultInCents;
+    }
+
+    public void setResultInCents(int resultInCents) {
+        this.resultInCents = resultInCents;
     }
 
     public String getDate() {

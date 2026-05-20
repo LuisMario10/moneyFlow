@@ -1,6 +1,5 @@
 package com.moneyFlow.controller;
 
-import com.moneyFlow.DAO.UserDAO;
 import com.moneyFlow.service.AuthService;
 import com.moneyFlow.view.LoginView;
 import com.moneyFlow.view.SignUpView;
@@ -79,13 +78,8 @@ public class UserController {
         String user = loginView.getUsernameField().getText();
         String pass = new String(loginView.getPasswordField().getPassword());
 
-        if (AuthService.login(user, pass)) {
-            JOptionPane.showMessageDialog(loginView, "Logado com sucesso!", "Sucesso",  JOptionPane.INFORMATION_MESSAGE);
-            showHome();
-        }
-        else {
-            showError("Verifique se o email e a senha estão corretos!");
-        }
+        AuthController authController = new AuthController();
+        authController.login(user, pass, loginView);
     }
 
     private void showError(String message) {

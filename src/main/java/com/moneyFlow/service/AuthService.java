@@ -1,23 +1,32 @@
 package com.moneyFlow.service;
 
-import com.moneyFlow.config.ConnectionDataBase;
-import com.moneyFlow.security.PasswordHasher;
 import com.moneyFlow.DAO.UserDAO;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.moneyFlow.model.UserModel;
+import com.moneyFlow.security.PasswordHasher;
 
 public class AuthService {
 
     public static boolean signUp(String username, String password) {
-        if (UserDAO.isUsernameTaken(username)) {
+        UserDAO userDAO = new UserDAO();
+
+        if (userDAO.findByAccessName(username) != null) {
             return false;
         }
-        return UserDAO.saveUser(username, password);
+        String hashedPassword = PasswordHasher.hash(password);
+        userDAO.create(new UserModel(username, hashedPassword));
+        return true;
     }
 
     public static boolean login(String username, String password) {
-        return UserDAO.validateLogin(username, password);
+        UserModel user = new UserDAO().findByAccessName(username);
+        if (user == null) {
+            return false;
+        }
+
+        if(PasswordHasher.check(password, user.getPassword()) == false) {
+            return false;
+        }
+
+        return true;
     }
 }
