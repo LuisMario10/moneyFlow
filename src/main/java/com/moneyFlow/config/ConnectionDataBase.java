@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 public class ConnectionDataBase {
     
-    private static final String URL = "jdbc:sqlite:src/resources/db/database.db";
+    private static final String URL = "jdbc:sqlite:moneyFlow/src/resources/db/database.db";
 
     private static Connection conn = null;
 

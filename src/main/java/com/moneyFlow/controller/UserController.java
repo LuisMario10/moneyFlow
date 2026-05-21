@@ -7,6 +7,7 @@ import com.moneyFlow.view.HomeView;
 import javax.swing.*;
 
 public class UserController {
+    
     private LoginView loginView;
     private SignUpView signUpView;
     private HomeView homeView;
@@ -79,7 +80,6 @@ public class UserController {
         String pass = new String(loginView.getPasswordField().getPassword());
 
         AuthController authController = new AuthController();
-        authController.login(user, pass, loginView);
     }
 
     private void showError(String message) {

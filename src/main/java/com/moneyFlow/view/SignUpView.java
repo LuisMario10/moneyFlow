@@ -178,6 +178,18 @@ public class SignUpView extends JFrame {
         goToLoginBtn = createStyledButton("Já Tenho Conta", ACCENT_BLUE, Color.WHITE);
         signUpBtn = createStyledButton("Registrar", BORDER_COLOR, TEXT_SECONDARY);
 
+        goToLoginBtn.addActionListener(e -> {
+            LoginView loginView = new LoginView();
+            loginView.setVisible(true);
+            this.dispose();
+        });
+
+        clearBtn.addActionListener(e -> {
+            usernameField.setText("");
+            passwordField.setText("");
+            confirmPasswordField.setText("");
+        });
+
         panel.add(clearBtn);
         panel.add(goToLoginBtn);
         panel.add(signUpBtn);

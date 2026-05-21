@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.RoundRectangle2D;
+import com.moneyFlow.controller.AuthController;
 
 public class LoginView extends JFrame {
 
@@ -15,10 +16,12 @@ public class LoginView extends JFrame {
     private static final Color TEXT_PRIMARY = new Color(235, 235, 245);
     private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
     private static final Color BORDER_COLOR = new Color(55, 55, 75);
+    private static final Color ERROR_RED = new Color(235, 87, 87);
 
     // Atributos da classe
     private JLabel usernameLabel;
     private JLabel passwordLabel;
+    private JLabel errorLabel;
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -53,7 +56,7 @@ public class LoginView extends JFrame {
             }
         };
         card.setOpaque(false);
-        card.setPreferredSize(new Dimension(700, 500));
+        card.setPreferredSize(new Dimension(700, 520));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(50, 60, 50, 60));
 
@@ -67,11 +70,11 @@ public class LoginView extends JFrame {
         card.add(Box.createVerticalStrut(10));
 
         card.add(createSeparator());
-        card.add(Box.createVerticalStrut(40));
+        card.add(Box.createVerticalStrut(35));
 
-        // Campo Usuário/Email com Placeholder
-        usernameLabel = createFieldLabel("USUÁRIO");
-        usernameField = createCustomTextField("Nome");
+        // Campo Usuário com Placeholder
+        usernameLabel = createFieldLabel("NOME");
+        usernameField = createCustomTextField("Digite seu nome");
 
         card.add(usernameLabel);
         card.add(usernameField);
@@ -79,12 +82,22 @@ public class LoginView extends JFrame {
 
         // Campo Senha com Placeholder
         passwordLabel = createFieldLabel("SENHA");
-        passwordField = createCustomPasswordField("Senha");
+        passwordField = createCustomPasswordField("Digite sua senha");
 
         card.add(passwordLabel);
         card.add(passwordField);
-        card.add(Box.createVerticalStrut(40));
+        card.add(Box.createVerticalStrut(10));
+
+        // Label de erro (inicialmente invisível)
+        errorLabel = new JLabel(" ");
+        errorLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        errorLabel.setForeground(ERROR_RED);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(errorLabel);
+
+        card.add(Box.createVerticalStrut(20));
         card.add(createButtonPanel());
+
         return card;
     }
 
@@ -161,6 +174,44 @@ public class LoginView extends JFrame {
         clearBtn = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
         signUpBtn = createStyledButton("Criar Conta", ACCENT_BLUE, Color.WHITE);
         loginBtn = createStyledButton("Entrar", BORDER_COLOR, TEXT_SECONDARY);
+
+        // Ação do botão Limpar
+        clearBtn.addActionListener(e -> {
+            usernameField.setText("");
+            passwordField.setText("");
+            errorLabel.setText(" ");
+        });
+
+        // Ação do botão Criar Conta
+        signUpBtn.addActionListener(e -> {
+            SignUpView signUpView = new SignUpView();
+            signUpView.setVisible(true);
+            this.dispose();
+        });
+
+        // Ação do botão Entrar
+        loginBtn.addActionListener(e -> {
+            String user = usernameField.getText().trim();
+            String pass = new String(passwordField.getPassword());
+
+            // Validação: campo nome vazio
+            if (user.isEmpty()) {
+                errorLabel.setText("Preencha o campo nome.");
+                return;
+            }
+
+            // Validação: senha com menos de 8 caracteres
+            if (pass.length() < 8) {
+                errorLabel.setText("Senha deve conter no mínimo 8 caracteres");
+                return;
+            }
+
+            // Limpa a mensagem de erro antes de tentar o login
+            errorLabel.setText(" ");
+
+            // Chama o método login do AuthController
+            AuthController.login(user, pass);
+        });
 
         panel.add(clearBtn);
         panel.add(signUpBtn);
