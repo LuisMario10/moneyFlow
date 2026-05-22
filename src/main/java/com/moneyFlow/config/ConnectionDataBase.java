@@ -19,6 +19,11 @@ public class ConnectionDataBase {
                 try (Statement stmt = conn.createStatement()) {
                     stmt.execute("PRAGMA journal_mode=WAL;");
                     stmt.execute("PRAGMA foreign_keys=ON;");
+                    try {
+                        stmt.execute("ALTER TABLE financial_transaction ADD COLUMN result_in_cents INTEGER DEFAULT 0;");
+                    } catch (SQLException e) {
+                        // Column might already exist, safe to ignore
+                    }
                 }
 
                 System.out.println("Data Base Mensage: Conexao com SQLite concedida!!");

@@ -137,6 +137,7 @@ public class HomeView extends JFrame {
             @Override public void mouseClicked(MouseEvent e) {
                 if ("Meu Perfil".equals(texto)) { new UserAccountManagementView().setVisible(true); }
                 else if ("Configurações".equals(texto)) { new ConfigView().setVisible(true); }
+                else if ("Balanços".equals(texto)) { new FinancialSummaryView().setVisible(true); }
             }
         });
         return label;
@@ -150,7 +151,7 @@ public class HomeView extends JFrame {
         barPanel.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         leftPanel.setOpaque(false);
-        leftPanel.add(createCustomButton("⚙ Relatório", theme.getBorderColor(), theme.getTextSecondary()));
+        leftPanel.add(createCustomButton("Em Breve...", theme.getBorderColor(), theme.getTextSecondary()));
         barPanel.add(leftPanel, BorderLayout.WEST);
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         centerPanel.setOpaque(false);

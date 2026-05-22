@@ -156,6 +156,9 @@ public class ConfigView extends JFrame {
                 if ("Meu Perfil".equals(texto)) {
                     dispose();
                     new UserAccountManagementView().setVisible(true);
+                } else if ("Balanços".equals(texto)) {
+                    dispose();
+                    new FinancialSummaryView().setVisible(true);
                 }
             }
         });

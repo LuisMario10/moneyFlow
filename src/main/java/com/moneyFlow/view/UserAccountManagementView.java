@@ -138,6 +138,9 @@ public class UserAccountManagementView extends JFrame {
                     if ("Configurações".equals(texto)) {
                         dispose();
                         new ConfigView().setVisible(true);
+                    } else if ("Balanços".equals(texto)) {
+                        dispose();
+                        new FinancialSummaryView().setVisible(true);
                     }
                 }
             });
