@@ -6,6 +6,8 @@ import com.moneyFlow.security.PasswordHasher;
 
 public class AuthService {
 
+    public static UserModel loggedUser;
+
     public static boolean signUp(String username, String password) {
         UserDAO userDAO = new UserDAO();
 
@@ -27,6 +29,7 @@ public class AuthService {
             return false;
         }
 
+        loggedUser = user;
         return true;
     }
 }

@@ -6,16 +6,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
 
+import com.moneyFlow.DAO.UserDAO;
+import com.moneyFlow.model.UserModel;
+import com.moneyFlow.security.PasswordHasher;
+import com.moneyFlow.service.AuthService;
+import com.moneyFlow.util.ThemeManager;
+
 public class UserAccountManagementView extends JFrame {
 
-    private static final Color BG_DARK       = new Color(18, 18, 24);
-    private static final Color BG_CARD       = new Color(30, 30, 42);
-    private static final Color BG_NAVBAR     = new Color(22, 22, 32);
-    private static final Color ACCENT_BLUE   = new Color(80, 140, 255);
-    private static final Color TEXT_PRIMARY  = new Color(235, 235, 245);
-    private static final Color TEXT_SECONDARY= new Color(160, 160, 180);
-    private static final Color BORDER_COLOR  = new Color(55, 55, 75);
-    private static final Color INPUT_BG      = new Color(24, 24, 36);
+    private final ThemeManager theme = ThemeManager.getInstance();
 
     private static final Font FONT_LOGO      = new Font("SansSerif", Font.BOLD, 22);
     private static final Font FONT_NAV       = new Font("SansSerif", Font.PLAIN, 14);
@@ -27,10 +26,22 @@ public class UserAccountManagementView extends JFrame {
     private JTextField fieldUsername;
     private JPasswordField fieldPassword;
     private JPasswordField fieldConfirmPassword;
+    private JLabel errorLabel;
+    private Runnable themeListener;
+
+    private UserModel loggedUser;
 
     public UserAccountManagementView() {
+        // Obter o usuário logado atualmente da sessão
+        this.loggedUser = AuthService.loggedUser;
+        if (this.loggedUser == null) {
+            // Backup seguro caso não esteja logado
+            this.loggedUser = new UserModel(1, "ADMIN", "", "12345678");
+        }
+
         windowConfig();
         setContentPane(createMainPanel());
+        registerThemeListener();
     }
 
     private void windowConfig() {
@@ -39,7 +50,7 @@ public class UserAccountManagementView extends JFrame {
         setSize(900, 650);
         setMinimumSize(new Dimension(750, 550));
         setLocationRelativeTo(null);
-        setBackground(BG_DARK);
+        setBackground(theme.getBgDark());
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
@@ -47,12 +58,31 @@ public class UserAccountManagementView extends JFrame {
         }
     }
 
+    private void registerThemeListener() {
+        themeListener = () -> {
+            SwingUtilities.invokeLater(() -> {
+                setContentPane(createMainPanel());
+                revalidate();
+                repaint();
+            });
+        };
+        theme.addThemeChangeListener(themeListener);
+
+        // Remove o listener ao fechar a janela
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                theme.removeThemeChangeListener(themeListener);
+            }
+        });
+    }
+
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(BG_DARK);
+        mainPanel.setBackground(theme.getBgDark());
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.setBackground(BG_DARK);
+        topPanel.setBackground(theme.getBgDark());
         topPanel.add(createNavBar());
         topPanel.add(createSubBar());
         mainPanel.add(topPanel, BorderLayout.NORTH);
@@ -66,16 +96,16 @@ public class UserAccountManagementView extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(BORDER_COLOR);
+                g2.setColor(theme.getBorderColor());
                 g2.fillRect(0, getHeight() - 1, getWidth(), 1);
                 g2.dispose();
             }
         };
-        navbar.setBackground(BG_NAVBAR);
+        navbar.setBackground(theme.getBgNavbar());
         navbar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         JLabel logo = new JLabel("moneyFlow");
         logo.setFont(FONT_LOGO);
-        logo.setForeground(ACCENT_BLUE);
+        logo.setForeground(theme.getAccentBlue());
         logo.setCursor(new Cursor(Cursor.HAND_CURSOR));
         logo.addMouseListener(new MouseAdapter() {
             @Override
@@ -98,12 +128,12 @@ public class UserAccountManagementView extends JFrame {
     private JLabel createMenuLabel(String texto, boolean active) {
         JLabel label = new JLabel(texto);
         label.setFont(active ? new Font("SansSerif", Font.BOLD, 14) : FONT_NAV);
-        label.setForeground(active ? TEXT_PRIMARY : TEXT_SECONDARY);
+        label.setForeground(active ? theme.getTextPrimary() : theme.getTextSecondary());
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         if (!active) {
             label.addMouseListener(new MouseAdapter() {
-                @Override public void mouseEntered(MouseEvent e) { label.setForeground(TEXT_PRIMARY); }
-                @Override public void mouseExited(MouseEvent e)  { label.setForeground(TEXT_SECONDARY); }
+                @Override public void mouseEntered(MouseEvent e) { label.setForeground(theme.getTextPrimary()); }
+                @Override public void mouseExited(MouseEvent e)  { label.setForeground(theme.getTextSecondary()); }
                 @Override public void mouseClicked(MouseEvent e) {
                     if ("Configurações".equals(texto)) {
                         dispose();
@@ -121,16 +151,16 @@ public class UserAccountManagementView extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setColor(BORDER_COLOR);
+                g2.setColor(theme.getBorderColor());
                 g2.fillRect(0, getHeight() - 1, getWidth(), 1);
                 g2.dispose();
             }
         };
-        bar.setBackground(BG_NAVBAR);
+        bar.setBackground(theme.getBgNavbar());
         bar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         JLabel title = new JLabel("Gerenciar Conta");
         title.setFont(FONT_TITLE);
-        title.setForeground(TEXT_PRIMARY);
+        title.setForeground(theme.getTextPrimary());
         title.setHorizontalAlignment(SwingConstants.CENTER);
         bar.add(title, BorderLayout.CENTER);
         return bar;
@@ -138,7 +168,7 @@ public class UserAccountManagementView extends JFrame {
 
     private JPanel createContentPanel() {
         JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setBackground(BG_DARK);
+        wrapper.setBackground(theme.getBgDark());
         JPanel card = createFormCard();
         wrapper.add(card);
         return wrapper;
@@ -150,7 +180,7 @@ public class UserAccountManagementView extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(BG_CARD);
+                g2.setColor(theme.getBgCard());
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 16, 16));
                 g2.dispose();
             }
@@ -158,22 +188,39 @@ public class UserAccountManagementView extends JFrame {
         card.setOpaque(false);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(BORDER_COLOR, 1, true),
+                new LineBorder(theme.getBorderColor(), 1, true),
                 BorderFactory.createEmptyBorder(35, 50, 30, 50)
         ));
-        card.setPreferredSize(new Dimension(480, 380));
+        card.setPreferredSize(new Dimension(480, 430));
+
         card.add(createInputRow("Alterar Nome do Usuário"));
         fieldUsername = createTextField();
+        fieldUsername.setText(loggedUser.getName()); // Preenche o nome atual
         card.add(fieldUsername);
+
         card.add(Box.createVerticalStrut(18));
+
         card.add(createInputRow("Alterar Senha"));
         fieldPassword = createPasswordField();
         card.add(fieldPassword);
+
         card.add(Box.createVerticalStrut(18));
+
         card.add(createInputRow("Confirmar Nova Senha"));
         fieldConfirmPassword = createPasswordField();
         card.add(fieldConfirmPassword);
-        card.add(Box.createVerticalStrut(30));
+
+        card.add(Box.createVerticalStrut(10));
+
+        // Label de erros
+        errorLabel = new JLabel(" ");
+        errorLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        errorLabel.setForeground(new Color(235, 87, 87));
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(errorLabel);
+
+        card.add(Box.createVerticalStrut(15));
+
         card.add(createButtonsRow());
         return card;
     }
@@ -181,7 +228,7 @@ public class UserAccountManagementView extends JFrame {
     private JLabel createInputRow(String labelText) {
         JLabel label = new JLabel(labelText);
         label.setFont(FONT_LABEL);
-        label.setForeground(TEXT_SECONDARY);
+        label.setForeground(theme.getTextSecondary());
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
         return label;
@@ -193,7 +240,7 @@ public class UserAccountManagementView extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(INPUT_BG);
+                g2.setColor(theme.getBgInput());
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
                 g2.dispose();
                 super.paintComponent(g);
@@ -209,7 +256,7 @@ public class UserAccountManagementView extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(INPUT_BG);
+                g2.setColor(theme.getBgInput());
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
                 g2.dispose();
                 super.paintComponent(g);
@@ -221,11 +268,11 @@ public class UserAccountManagementView extends JFrame {
 
     private void styleInputField(JTextField field) {
         field.setFont(FONT_INPUT);
-        field.setForeground(TEXT_PRIMARY);
-        field.setCaretColor(TEXT_PRIMARY);
+        field.setForeground(theme.getTextPrimary());
+        field.setCaretColor(theme.getTextPrimary());
         field.setOpaque(false);
         field.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(BORDER_COLOR, 1, true),
+                new LineBorder(theme.getBorderColor(), 1, true),
                 BorderFactory.createEmptyBorder(8, 14, 8, 14)
         ));
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
@@ -234,14 +281,14 @@ public class UserAccountManagementView extends JFrame {
             @Override
             public void focusGained(FocusEvent e) {
                 field.setBorder(BorderFactory.createCompoundBorder(
-                        new LineBorder(ACCENT_BLUE, 1, true),
+                        new LineBorder(theme.getAccentBlue(), 1, true),
                         BorderFactory.createEmptyBorder(8, 14, 8, 14)
                 ));
             }
             @Override
             public void focusLost(FocusEvent e) {
                 field.setBorder(BorderFactory.createCompoundBorder(
-                        new LineBorder(BORDER_COLOR, 1, true),
+                        new LineBorder(theme.getBorderColor(), 1, true),
                         BorderFactory.createEmptyBorder(8, 14, 8, 14)
                 ));
             }
@@ -253,9 +300,9 @@ public class UserAccountManagementView extends JFrame {
         row.setOpaque(false);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        JButton btnVoltar = createCustomButton("Voltar", BORDER_COLOR, TEXT_SECONDARY);
+        JButton btnVoltar = createCustomButton("Voltar", theme.getBorderColor(), theme.getTextSecondary());
         btnVoltar.addActionListener(e -> dispose());
-        JButton btnConfirmar = createCustomButton("Confirmar", new Color(30, 60, 100), ACCENT_BLUE);
+        JButton btnConfirmar = createCustomButton("Confirmar", new Color(30, 60, 100), theme.getAccentBlue());
         btnConfirmar.addActionListener(e -> handleConfirm());
         row.add(btnVoltar, BorderLayout.WEST);
         row.add(btnConfirmar, BorderLayout.EAST);
@@ -288,21 +335,53 @@ public class UserAccountManagementView extends JFrame {
         String username = fieldUsername.getText().trim();
         String password = new String(fieldPassword.getPassword());
         String confirm  = new String(fieldConfirmPassword.getPassword());
-        if (username.isEmpty() && password.isEmpty()) {
-            showMessage("Preencha ao menos um campo para atualizar.", false);
-            return;
-        }
-        if (!password.isEmpty() && !password.equals(confirm)) {
-            showMessage("As senhas não coincidem. Tente novamente.", false);
+
+        if (username.isEmpty()) {
+            errorLabel.setText("O nome do usuário não pode ser vazio.");
             return;
         }
 
-        showMessage("Perfil atualizado com sucesso!", true);
-    }
+        if (username.length() < 5) {
+            errorLabel.setText("O nome deve conter no mínimo 5 caracteres.");
+            return;
+        }
 
-    private void showMessage(String msg, boolean success) {
-        JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = optionPane.createDialog(this, success ? "Sucesso" : "Atenção");
-        dialog.setVisible(true);
+        // Valida se o novo nome de usuário já pertence a outra pessoa
+        UserDAO userDAO = new UserDAO();
+        UserModel existing = userDAO.findByAccessName(username);
+        if (existing != null && existing.getId() != loggedUser.getId()) {
+            errorLabel.setText("Este nome de usuário já está em uso.");
+            return;
+        }
+
+        // Valida senha se foi informada
+        if (!password.isEmpty()) {
+            if (password.length() < 8) {
+                errorLabel.setText("A nova senha deve conter no mínimo 8 caracteres.");
+                return;
+            }
+            if (!password.equals(confirm)) {
+                errorLabel.setText("As senhas não coincidem.");
+                return;
+            }
+        }
+
+        errorLabel.setText(" "); // Limpa erros
+
+        // Atualiza os dados
+        loggedUser.setName(username);
+        if (!password.isEmpty()) {
+            String hashedPassword = PasswordHasher.hash(password);
+            loggedUser.setPassword(hashedPassword);
+        }
+
+        // Salva persistido no Banco de Dados
+        userDAO.update(loggedUser);
+
+        // Atualiza os dados da sessão
+        AuthService.loggedUser = loggedUser;
+
+        JOptionPane.showMessageDialog(this, "Perfil atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        dispose();
     }
 }

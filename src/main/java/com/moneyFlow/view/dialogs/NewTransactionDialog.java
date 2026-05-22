@@ -7,13 +7,12 @@ import java.awt.geom.RoundRectangle2D;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.moneyFlow.util.ThemeManager;
+import com.moneyFlow.util.CurrencyManager;
+
 public class NewTransactionDialog extends JDialog {
 
-    private static final Color BG_DARK = new Color(30, 30, 42);
-    private static final Color BG_INPUT = new Color(40, 40, 55);
-    private static final Color ACCENT_COLOR = new Color(80, 140, 255);
-    private static final Color TEXT_PRIMARY = new Color(235, 235, 245);
-    private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
+    private final ThemeManager theme = ThemeManager.getInstance();
 
     private JTextField txtTitle;
     private JTextField txtValue;
@@ -30,19 +29,19 @@ public class NewTransactionDialog extends JDialog {
         setSize(400, 550);
         setLocationRelativeTo(parent);
         setResizable(false);
-        getContentPane().setBackground(BG_DARK);
+        getContentPane().setBackground(theme.getBgCard());
         initComponents();
     }
 
     private void initComponents() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(BG_DARK);
+        mainPanel.setBackground(theme.getBgCard());
         mainPanel.setBorder(new EmptyBorder(25, 30, 25, 30));
 
         JLabel lblHeader = new JLabel(isReceita ? "Adicionar Receita" : "Adicionar Despesa");
         lblHeader.setFont(new Font("SansSerif", Font.BOLD, 22));
-        lblHeader.setForeground(isReceita ? new Color(72, 199, 142) : new Color(235, 87, 87));
+        lblHeader.setForeground(isReceita ? theme.getAccentGreen() : theme.getAccentRed());
         lblHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(lblHeader);
         mainPanel.add(Box.createVerticalStrut(25));
@@ -51,7 +50,7 @@ public class NewTransactionDialog extends JDialog {
         mainPanel.add(createFieldPanel("Título", txtTitle));
 
         txtValue = createTextField();
-        mainPanel.add(createFieldPanel("Valor (R$)", txtValue));
+        mainPanel.add(createFieldPanel("Valor (" + CurrencyManager.getInstance().getCurrency().getSymbol() + ")", txtValue));
 
         txtDate = createTextField();
         txtDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -60,27 +59,27 @@ public class NewTransactionDialog extends JDialog {
         String[] categories = isReceita ? new String[]{"Salário", "Investimento", "Outros"}
                                         : new String[]{"Alimentação", "Transporte", "Moradia", "Lazer", "Outros"};
         cbCategory = new JComboBox<>(categories);
-        cbCategory.setBackground(BG_INPUT);
-        cbCategory.setForeground(TEXT_PRIMARY);
+        cbCategory.setBackground(theme.getBgInput());
+        cbCategory.setForeground(theme.getTextPrimary());
         cbCategory.setFont(new Font("SansSerif", Font.PLAIN, 14));
         mainPanel.add(createFieldPanel("Categoria", cbCategory));
 
         txtDescription = new JTextArea(3, 20);
-        txtDescription.setBackground(BG_INPUT);
-        txtDescription.setForeground(TEXT_PRIMARY);
+        txtDescription.setBackground(theme.getBgInput());
+        txtDescription.setForeground(theme.getTextPrimary());
         txtDescription.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        txtDescription.setCaretColor(TEXT_PRIMARY);
+        txtDescription.setCaretColor(theme.getTextPrimary());
         txtDescription.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(55, 55, 75)),
+            BorderFactory.createLineBorder(theme.getBorderColor()),
             BorderFactory.createEmptyBorder(8, 8, 8, 8)
         ));
         txtDescription.setLineWrap(true);
         txtDescription.setWrapStyleWord(true);
 
         JPanel descPanel = new JPanel(new BorderLayout(0, 5));
-        descPanel.setBackground(BG_DARK);
+        descPanel.setBackground(theme.getBgCard());
         JLabel lblDesc = new JLabel("Descrição");
-        lblDesc.setForeground(TEXT_SECONDARY);
+        lblDesc.setForeground(theme.getTextSecondary());
         lblDesc.setFont(new Font("SansSerif", Font.BOLD, 13));
         descPanel.add(lblDesc, BorderLayout.NORTH);
         descPanel.add(new JScrollPane(txtDescription), BorderLayout.CENTER);
@@ -90,12 +89,12 @@ public class NewTransactionDialog extends JDialog {
         mainPanel.add(Box.createVerticalStrut(25));
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-        buttonsPanel.setBackground(BG_DARK);
+        buttonsPanel.setBackground(theme.getBgCard());
 
-        JButton btnCancel = createButton("Cancelar", new Color(60, 60, 75), TEXT_PRIMARY);
+        JButton btnCancel = createButton("Cancelar", theme.getBorderColor(), theme.getTextPrimary());
         btnCancel.addActionListener(e -> dispose());
 
-        JButton btnSave = createButton("Salvar", ACCENT_COLOR, Color.WHITE);
+        JButton btnSave = createButton("Salvar", theme.getAccentBlue(), Color.WHITE);
         btnSave.addActionListener(e -> {
             confirmed = true;
             dispose();
@@ -110,12 +109,12 @@ public class NewTransactionDialog extends JDialog {
 
     private JTextField createTextField() {
         JTextField field = new JTextField();
-        field.setBackground(BG_INPUT);
-        field.setForeground(TEXT_PRIMARY);
-        field.setCaretColor(TEXT_PRIMARY);
+        field.setBackground(theme.getBgInput());
+        field.setForeground(theme.getTextPrimary());
+        field.setCaretColor(theme.getTextPrimary());
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(55, 55, 75)),
+            BorderFactory.createLineBorder(theme.getBorderColor()),
             BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
         return field;
@@ -123,9 +122,9 @@ public class NewTransactionDialog extends JDialog {
 
     private JPanel createFieldPanel(String labelText, JComponent field) {
         JPanel panel = new JPanel(new BorderLayout(0, 5));
-        panel.setBackground(BG_DARK);
+        panel.setBackground(theme.getBgCard());
         JLabel label = new JLabel(labelText);
-        label.setForeground(TEXT_SECONDARY);
+        label.setForeground(theme.getTextSecondary());
         label.setFont(new Font("SansSerif", Font.BOLD, 13));
         panel.add(label, BorderLayout.NORTH);
         panel.add(field, BorderLayout.CENTER);

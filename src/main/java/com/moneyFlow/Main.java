@@ -1,6 +1,5 @@
 package com.moneyFlow;
 
-import com.moneyFlow.view.HomeView;
 import com.moneyFlow.view.LoginView;
 
 public class Main {

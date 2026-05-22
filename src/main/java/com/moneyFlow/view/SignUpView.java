@@ -7,19 +7,18 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.RoundRectangle2D;
 
+import com.moneyFlow.service.AuthService;
+import com.moneyFlow.util.ThemeManager;
+
 public class SignUpView extends JFrame {
 
-    private static final Color BG_DARK = new Color(18, 18, 24);
-    private static final Color BG_CARD = new Color(30, 30, 42);
-    private static final Color ACCENT_BLUE = new Color(80, 140, 255);
-    private static final Color TEXT_PRIMARY = new Color(235, 235, 245);
-    private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
-    private static final Color BORDER_COLOR = new Color(55, 55, 75);
+    private final ThemeManager theme = ThemeManager.getInstance();
+    private static final Color ERROR_RED = new Color(235, 87, 87);
 
-    //Atributos da classe
     private JLabel usernameLabel;
     private JLabel passwordLabel;
     private JLabel confirmPasswordLabel;
+    private JLabel errorLabel;
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -35,7 +34,7 @@ public class SignUpView extends JFrame {
         setSize(850, 700);
         setMinimumSize(new Dimension(850, 700));
         setLocationRelativeTo(null);
-        getContentPane().setBackground(BG_DARK);
+        getContentPane().setBackground(theme.getBgDark());
         setLayout(new GridBagLayout());
 
         add(createSignUpCard());
@@ -47,22 +46,22 @@ public class SignUpView extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(BG_CARD);
+                g2.setColor(theme.getBgCard());
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 20, 20));
-                g2.setColor(BORDER_COLOR);
+                g2.setColor(theme.getBorderColor());
                 g2.draw(new RoundRectangle2D.Float(0, 0, getWidth() - 1, getHeight() - 1, 20, 20));
                 g2.dispose();
             }
         };
         card.setOpaque(false);
-        card.setPreferredSize(new Dimension(700, 550));
+        card.setPreferredSize(new Dimension(700, 570));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(40, 60, 40, 60));
 
         // Logo
         JLabel labelLogo = new JLabel("moneyFlow - Seu APP para gerir dinheiro");
         labelLogo.setFont(new Font("SansSerif", Font.BOLD, 28));
-        labelLogo.setForeground(ACCENT_BLUE);
+        labelLogo.setForeground(theme.getAccentBlue());
         labelLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         card.add(labelLogo);
@@ -71,8 +70,8 @@ public class SignUpView extends JFrame {
         card.add(createSeparator());
         card.add(Box.createVerticalStrut(30));
 
-        // Campo Usuário/Email
-        usernameLabel = createFieldLabel("USUÁRIO");
+        // Campo Nome do Usuário
+        usernameLabel = createFieldLabel("NOME");
         usernameField = createCustomTextField("Nome do Usuário");
 
         card.add(usernameLabel);
@@ -82,7 +81,7 @@ public class SignUpView extends JFrame {
 
         // Campo Senha
         passwordLabel = createFieldLabel("SENHA");
-        passwordField = createCustomPasswordField("Senha");
+        passwordField = createCustomPasswordField("Mínimo 8 caracteres");
 
         card.add(passwordLabel);
         card.add(passwordField);
@@ -91,12 +90,21 @@ public class SignUpView extends JFrame {
 
         // Campo Confirmar Senha
         confirmPasswordLabel = createFieldLabel("CONFIRMAR SENHA");
-        confirmPasswordField = createCustomPasswordField("Confirmar Senha");
+        confirmPasswordField = createCustomPasswordField("Repita a senha");
 
         card.add(confirmPasswordLabel);
         card.add(confirmPasswordField);
 
-        card.add(Box.createVerticalStrut(40));
+        card.add(Box.createVerticalStrut(15));
+
+        // Label de erro (inicialmente vazio)
+        errorLabel = new JLabel(" ");
+        errorLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        errorLabel.setForeground(ERROR_RED);
+        errorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(errorLabel);
+
+        card.add(Box.createVerticalStrut(25));
 
         // Painel de Botões
         card.add(createButtonPanel());
@@ -107,7 +115,7 @@ public class SignUpView extends JFrame {
     private JComponent createSeparator() {
         JSeparator sep = new JSeparator();
         sep.setMaximumSize(new Dimension(400, 1));
-        sep.setForeground(BORDER_COLOR);
+        sep.setForeground(theme.getBorderColor());
         return sep;
     }
 
@@ -118,7 +126,7 @@ public class SignUpView extends JFrame {
                 super.paintComponent(g);
                 if (getText().isEmpty() && !hasFocus()) {
                     Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setColor(TEXT_SECONDARY);
+                    g2.setColor(theme.getTextSecondary());
                     g2.setFont(getFont().deriveFont(Font.BOLD));
                     int padding = getInsets().left;
                     FontMetrics fm = g2.getFontMetrics();
@@ -139,7 +147,7 @@ public class SignUpView extends JFrame {
                 super.paintComponent(g);
                 if (getPassword().length == 0 && !hasFocus()) {
                     Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setColor(TEXT_SECONDARY);
+                    g2.setColor(theme.getTextSecondary());
                     g2.setFont(getFont().deriveFont(Font.BOLD));
                     int padding = getInsets().left;
                     FontMetrics fm = g2.getFontMetrics();
@@ -155,12 +163,12 @@ public class SignUpView extends JFrame {
 
     private void setupFieldStyle(JTextField field) {
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        field.setBackground(BG_DARK);
-        field.setForeground(TEXT_PRIMARY);
-        field.setCaretColor(TEXT_PRIMARY);
+        field.setBackground(theme.getBgDark());
+        field.setForeground(theme.getTextPrimary());
+        field.setCaretColor(theme.getTextPrimary());
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 1, true),
+                BorderFactory.createLineBorder(theme.getBorderColor(), 1, true),
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
         field.addFocusListener(new FocusAdapter() {
@@ -174,20 +182,63 @@ public class SignUpView extends JFrame {
         panel.setOpaque(false);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        clearBtn = createStyledButton("Limpar", BORDER_COLOR, TEXT_SECONDARY);
-        goToLoginBtn = createStyledButton("Já Tenho Conta", ACCENT_BLUE, Color.WHITE);
-        signUpBtn = createStyledButton("Registrar", BORDER_COLOR, TEXT_SECONDARY);
+        clearBtn = createStyledButton("Limpar", theme.getBorderColor(), theme.getTextSecondary());
+        goToLoginBtn = createStyledButton("Já Tenho Conta", theme.getAccentBlue(), Color.WHITE);
+        signUpBtn = createStyledButton("Registrar", theme.getBorderColor(), theme.getTextSecondary());
 
+        // Voltar/Já Tenho Conta
         goToLoginBtn.addActionListener(e -> {
             LoginView loginView = new LoginView();
             loginView.setVisible(true);
             this.dispose();
         });
 
+        // Limpar Campos
         clearBtn.addActionListener(e -> {
             usernameField.setText("");
             passwordField.setText("");
             confirmPasswordField.setText("");
+            errorLabel.setText(" ");
+        });
+
+        // Registrar
+        signUpBtn.addActionListener(e -> {
+            String name = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
+
+            // Validações
+            if (name.isEmpty()) {
+                errorLabel.setText("Preencha o campo Nome.");
+                return;
+            }
+
+            if (name.length() < 5) {
+                errorLabel.setText("Nome deve conter no mínimo 5 caracteres.");
+                return;
+            }
+
+            if (password.length() < 8) {
+                errorLabel.setText("Senha deve conter no mínimo 8 caracteres.");
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                errorLabel.setText("As senhas não coincidem.");
+                return;
+            }
+
+            errorLabel.setText(" "); // Limpa erros
+
+            // Persistência
+            if (AuthService.signUp(name, password)) {
+                JOptionPane.showMessageDialog(this, "Conta criada com sucesso! Faça login.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                LoginView loginView = new LoginView();
+                loginView.setVisible(true);
+                this.dispose();
+            } else {
+                errorLabel.setText("Usuário já cadastrado.");
+            }
         });
 
         panel.add(clearBtn);
@@ -222,7 +273,7 @@ public class SignUpView extends JFrame {
     private JLabel createFieldLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("SansSerif", Font.BOLD, 12));
-        label.setForeground(TEXT_SECONDARY);
+        label.setForeground(theme.getTextSecondary());
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         return label;
     }

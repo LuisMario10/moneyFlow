@@ -6,17 +6,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
 
+import com.moneyFlow.util.ThemeManager;
+import com.moneyFlow.util.CurrencyManager;
+
 public class ConfigView extends JFrame {
-    // Cores do tema
-    private static final Color BG_DARK = new Color(18, 18, 24);
-    private static final Color BG_CARD = new Color(30, 30, 42);
-    private static final Color BG_NAVBAR = new Color(22, 22, 32);
-    private static final Color ACCENT_BLUE = new Color(80, 140, 255);
-    // private static final Color ACCENT_GREEN = new Color(72, 199, 142);
-    // private static final Color ACCENT_RED = new Color(235, 87, 87);
-    private static final Color TEXT_PRIMARY = new Color(235, 235, 245);
-    private static final Color TEXT_SECONDARY = new Color(160, 160, 180);
-    private static final Color BORDER_COLOR = new Color(55, 55, 75);
+
+    private final ThemeManager theme = ThemeManager.getInstance();
+    private final CurrencyManager currencyManager = CurrencyManager.getInstance();
 
     // Fontes
     private static final Font FONT_LOGO = new Font("SansSerif", Font.BOLD, 22);
@@ -24,10 +20,19 @@ public class ConfigView extends JFrame {
     private static final Font FONT_BTN = new Font("SansSerif", Font.BOLD, 13);
     private static final Font FONT_TITLE = new Font("SansSerif", Font.BOLD, 16);
 
+    // Referências para os botões de tema (para destacar o ativo)
+    private JButton btnLight;
+    private JButton btnDark;
+
+    // Listeners de eventos
+    private Runnable themeListener;
+    private Runnable currencyListener;
+
     public ConfigView() {
         windowConfig();
         JPanel mainPanel = createMainPanel();
         setContentPane(mainPanel);
+        registerListeners();
     }
 
     private void windowConfig() {
@@ -36,7 +41,7 @@ public class ConfigView extends JFrame {
         setSize(900, 650);
         setMinimumSize(new Dimension(750, 550));
         setLocationRelativeTo(null);
-        setBackground(BG_DARK);
+        setBackground(theme.getBgDark());
 
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -45,9 +50,38 @@ public class ConfigView extends JFrame {
         }
     }
 
+    private void registerListeners() {
+        themeListener = () -> {
+            SwingUtilities.invokeLater(() -> {
+                setContentPane(createMainPanel());
+                revalidate();
+                repaint();
+            });
+        };
+        theme.addThemeChangeListener(themeListener);
+
+        currencyListener = () -> {
+            SwingUtilities.invokeLater(() -> {
+                setContentPane(createMainPanel());
+                revalidate();
+                repaint();
+            });
+        };
+        currencyManager.addCurrencyChangeListener(currencyListener);
+
+        // Remove os listeners ao fechar a janela
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                theme.removeThemeChangeListener(themeListener);
+                currencyManager.removeCurrencyChangeListener(currencyListener);
+            }
+        });
+    }
+
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(BG_DARK);
+        mainPanel.setBackground(theme.getBgDark());
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -66,16 +100,16 @@ public class ConfigView extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(BORDER_COLOR);
+                g.setColor(theme.getBorderColor());
                 g.fillRect(0, getHeight() - 1, getWidth(), 1);
             }
         };
-        navbar.setBackground(BG_NAVBAR);
+        navbar.setBackground(theme.getBgNavbar());
         navbar.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
 
         JLabel logo = new JLabel("moneyFlow");
         logo.setFont(FONT_LOGO);
-        logo.setForeground(ACCENT_BLUE);
+        logo.setForeground(theme.getAccentBlue());
         logo.setCursor(new Cursor(Cursor.HAND_CURSOR));
         logo.addMouseListener(new MouseAdapter() {
             @Override
@@ -101,14 +135,14 @@ public class ConfigView extends JFrame {
         label.setFont(FONT_NAV);
 
         // Define dinamicamente a cor padrão da aba
-        Color defaultColor = texto.equals("Configurações") ? ACCENT_BLUE : TEXT_SECONDARY;
+        Color defaultColor = texto.equals("Configurações") ? theme.getAccentBlue() : theme.getTextSecondary();
         label.setForeground(defaultColor);
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                label.setForeground(TEXT_PRIMARY);
+                label.setForeground(theme.getTextPrimary());
             }
 
             @Override
@@ -133,12 +167,12 @@ public class ConfigView extends JFrame {
     private JPanel createActionsBar() {
         // GridBagLayout garante centralização matemática real do título
         JPanel barPanel = new JPanel(new GridBagLayout());
-        barPanel.setBackground(BG_NAVBAR);
+        barPanel.setBackground(theme.getBgNavbar());
         barPanel.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
 
         JLabel title = new JLabel("Configurações");
         title.setFont(FONT_TITLE);
-        title.setForeground(TEXT_PRIMARY);
+        title.setForeground(theme.getTextPrimary());
         barPanel.add(title);
 
         return barPanel;
@@ -148,43 +182,91 @@ public class ConfigView extends JFrame {
     private JPanel createContentPanel() {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(BG_DARK);
+        contentPanel.setBackground(theme.getBgDark());
         contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
-        contentPanel.add(createSelectionCard("Defina o Tema:", new String[]{"Light", "Dark"}));
+        contentPanel.add(createThemeCard());
         contentPanel.add(Box.createVerticalStrut(30));
-        contentPanel.add(createSelectionCard("Moeda Corrente:", new String[]{"Real (R$)", "Euro (€)", "Libra (£)", "Dólar ($)"}));
+        contentPanel.add(createCurrencyCard());
 
         return contentPanel;
     }
 
-    private JPanel createSelectionCard(String title, String[] options) {
+    // ==================== CARD DE TEMA ====================
+    private JPanel createThemeCard() {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout());
-        card.setBackground(BG_CARD);
+        card.setBackground(theme.getBgCard());
         card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(BORDER_COLOR, 1, true),
+                new LineBorder(theme.getBorderColor(), 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         card.setMaximumSize(new Dimension(800, 120));
 
-        JLabel titleLabel = new JLabel(title);
+        JLabel titleLabel = new JLabel("Defina o Tema:");
         titleLabel.setFont(FONT_TITLE);
-        titleLabel.setForeground(TEXT_PRIMARY);
+        titleLabel.setForeground(theme.getTextPrimary());
         card.add(titleLabel, BorderLayout.NORTH);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
         buttonsPanel.setOpaque(false);
 
-        for (String opt : options) {
-            buttonsPanel.add(createCustomButton(opt, BORDER_COLOR, TEXT_SECONDARY));
+        // Botão Light
+        boolean isLight = !theme.isDarkMode();
+        btnLight = createActiveButton("☀ Light", isLight);
+        btnLight.addActionListener(e -> theme.setTheme(false));
+
+        // Botão Dark
+        boolean isDark = theme.isDarkMode();
+        btnDark = createActiveButton("🌙 Dark", isDark);
+        btnDark.addActionListener(e -> theme.setTheme(true));
+
+        buttonsPanel.add(btnLight);
+        buttonsPanel.add(btnDark);
+
+        card.add(buttonsPanel, BorderLayout.CENTER);
+        return card;
+    }
+
+    // ==================== CARD DE MOEDA ====================
+    private JPanel createCurrencyCard() {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout());
+        card.setBackground(theme.getBgCard());
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(theme.getBorderColor(), 1, true),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        card.setMaximumSize(new Dimension(800, 120));
+
+        JLabel titleLabel = new JLabel("Moeda Corrente:");
+        titleLabel.setFont(FONT_TITLE);
+        titleLabel.setForeground(theme.getTextPrimary());
+        card.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
+        buttonsPanel.setOpaque(false);
+
+        CurrencyManager.ECurrency activeCurrency = currencyManager.getCurrency();
+
+        for (CurrencyManager.ECurrency cur : CurrencyManager.ECurrency.values()) {
+            boolean active = (cur == activeCurrency);
+            JButton btn = createActiveButton(cur.getDisplayName(), active);
+            btn.addActionListener(e -> currencyManager.setCurrency(cur));
+            buttonsPanel.add(btn);
         }
 
         card.add(buttonsPanel, BorderLayout.CENTER);
         return card;
     }
 
-    private JButton createCustomButton(String text, Color bgColor, Color fgColor) {
+    /**
+     * Cria um botão estilizado, destacando em azul caso esteja ativo.
+     */
+    private JButton createActiveButton(String text, boolean active) {
+        Color bgColor = active ? theme.getAccentBlue() : theme.getBorderColor();
+        Color fgColor = active ? Color.WHITE : theme.getTextSecondary();
+
         JButton btn = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -198,7 +280,7 @@ public class ConfigView extends JFrame {
         };
         btn.setFont(FONT_BTN);
         btn.setForeground(fgColor);
-        btn.setPreferredSize(new Dimension(110, 35));
+        btn.setPreferredSize(new Dimension(130, 35));
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);
