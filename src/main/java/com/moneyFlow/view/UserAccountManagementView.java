@@ -128,7 +128,7 @@ public class UserAccountManagementView extends JFrame {
     private JLabel createMenuLabel(String texto, boolean active) {
         JLabel label = new JLabel(texto);
         label.setFont(active ? new Font("SansSerif", Font.BOLD, 14) : FONT_NAV);
-        label.setForeground(active ? theme.getTextPrimary() : theme.getTextSecondary());
+        label.setForeground(active ? theme.getAccentBlue() : theme.getTextSecondary());
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         if (!active) {
             label.addMouseListener(new MouseAdapter() {
